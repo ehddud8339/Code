@@ -17,12 +17,17 @@ void insertion_sort(int* input_arr, int len);
 void bubble_sort(int* input_arr, int len);
 
 // 병합 정렬, 안정성
-// 둘 이상의 집합으로 나누어 정렬하고 합쳐서 정렬
+// 1. 입력 배열을 두 개의 배열로 분할, 합병 함수 호출
+// 2. 결과 배열과 두 개의 합병할 배열을 받아 결과 배열에 정렬하는 함수
 void merge(int* input_arr, int* left, int left_len, int* right, int right_len);
 void merge_sort(int* input_arr, int len);
 
 // 힙 정렬
-// 트리 기반으로 힙 트리를 구성해 정렬, 완전 이진 트리 필요
+// 1. 입력 배열을 힙 트리로 변환
+// 2. 루트 값을 결과 배열의 맨 뒤에 삽입
+// 3. 힙 트리를 다시 정렬
+void heapify(int* input_arr, int len, int root_idx);
+void build_heap(int* input_arr, int len);
 void heap_sort(int* input_arr, int len);
 
 // 퀵 정렬
@@ -45,6 +50,12 @@ int main(int argc, char* argv[]) {
 }
 
 // 함수 정의 ============================
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
 void selection_sort(int* input_arr, int len) {
     int idx, jdx, min, temp;
@@ -93,7 +104,7 @@ void bubble_sort(int* input_arr, int len) {
 // 두 개의 정렬된 배열을 병합하는 함수
 void merge(int* input_arr, int* left, int left_len, int* right, int right_len) {
     int idx = 0, jdx = 0, kdx = 0;
-    // 왼쪽과 오른쪽의 대소 비교를 하며 기존의 배열에 할당
+    // 왼쪽과 오른쪽의 대소 비교를 하며 기존의 배열에 삽입
     while(idx < left_len && jdx < right_len) {
         if(left[idx] <= right[jdx]) {
             input_arr[kdx++] = left[idx++];
@@ -113,7 +124,7 @@ void merge_sort(int* input_arr, int len) {
     if(len < 2)
         return;
 
-    int mid = (len)/2;
+    int mid = (len)/2; // 인덱스가 아닌 길이이기 때문에 -1 X
     int* left = (int*)malloc(mid * sizeof(int));
     int* right = (int*)malloc((len - mid) * sizeof(int));
 
@@ -131,6 +142,38 @@ void merge_sort(int* input_arr, int len) {
     free(right);
 }
 
+void heapify(int* input_arr, int len, int root_idx) {
+    int largest = root_idx;  // 루트를 가장 큰 값으로 초기화
+    int left = 2 * root_idx + 1;  // 왼쪽 자식 노드
+    int right = 2 * root_idx + 2; // 오른쪽 자식 노드
+
+    // 왼쪽 자식이 루트보다 크다면 largest를 왼쪽 자식으로 변경
+    if (left < len && input_arr[left] > input_arr[largest])
+        largest = left;
+
+    // 오른쪽 자식이 largest보다 크다면 largest를 오른쪽 자식으로 변경
+    if (right < len && input_arr[right] > input_arr[largest])
+        largest = right;
+
+    // largest가 루트가 아니라면 두 요소를 교환하고 재귀적으로 힙을 구성
+    if (largest != root_idx) {
+        swap(&input_arr[root_idx], &input_arr[largest]);
+
+        heapify(input_arr, len, largest);
+    }
+}
+
+void build_heap(int* input_arr, int len) {
+    for (int idx = len / 2 - 1; idx >= 0; idx--)
+        heapify(input_arr, len, idx);
+}
+
 void heap_sort(int* input_arr, int len) {
-    
+    build_heap(input_arr, len);
+
+    for (int i = len - 1; i > 0; i--) {
+        swap(&input_arr[0], &input_arr[i]);
+
+        heapify(input_arr, i, 0);
+    }
 }
