@@ -32,7 +32,8 @@ void heap_sort(int* input_arr, int len);
 
 // 퀵 정렬
 // 집합 내의 임의의 pivot을 설정, 두 개의 집합으로 분리
-void quick_sort(int* input_arr, int len);
+int partition(int* input_arr, int low, int high);
+void quick_sort(int* input_arr, int low, int high);
 
 // 기수 정렬
 // 낮은 자리수부터 비교하며 정렬, 메모리 공간 필요
@@ -49,7 +50,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// 함수 정의 ============================
+/*====================================*/
 
 void swap(int* a, int* b) {
     int temp = *a;
@@ -57,6 +58,7 @@ void swap(int* a, int* b) {
     *b = temp;
 }
 
+/*====================================*/
 void selection_sort(int* input_arr, int len) {
     int idx, jdx, min, temp;
 
@@ -74,6 +76,7 @@ void selection_sort(int* input_arr, int len) {
     }
 }
 
+/*====================================*/
 void insertion_sort(int* input_arr, int len) {
     int idx, jdx, temp;
 
@@ -88,6 +91,7 @@ void insertion_sort(int* input_arr, int len) {
     }
 }
 
+/*====================================*/
 void bubble_sort(int* input_arr, int len) {
     int idx, jdx, temp;
 
@@ -101,7 +105,8 @@ void bubble_sort(int* input_arr, int len) {
         }
     }
 }
-// 두 개의 정렬된 배열을 병합하는 함수
+
+/*====================================*/
 void merge(int* input_arr, int* left, int left_len, int* right, int right_len) {
     int idx = 0, jdx = 0, kdx = 0;
     // 왼쪽과 오른쪽의 대소 비교를 하며 기존의 배열에 삽입
@@ -142,6 +147,7 @@ void merge_sort(int* input_arr, int len) {
     free(right);
 }
 
+/*====================================*/
 void heapify(int* input_arr, int len, int root_idx) {
     int largest = root_idx;  // 루트를 가장 큰 값으로 초기화
     int left = 2 * root_idx + 1;  // 왼쪽 자식 노드
@@ -177,3 +183,42 @@ void heap_sort(int* input_arr, int len) {
         heapify(input_arr, i, 0);
     }
 }
+
+/*====================================*/
+int partition (int* input_arr, int low, int high) {
+    // 중간 요소를 피봇으로 설정하는 경우
+    // int mid = low + (high - low) / 2;
+    // int pivot = input_arr[mid];
+    // swap(&input_arr[pivot], &input_arr[high]);
+    // pivot = input_arr[high];
+
+    int pivot = input_arr[high];
+    // pivot보다 작은 값을 가지는 요소들의 마지막 인덱스
+    int low_idx = low - 1;
+
+    // 배열을 순회하면서 피봇보다 작은 값을 탐색
+    for (int cur_idx = low; cur_idx < high; cur_idx++) {
+        if (input_arr[cur_idx] <= pivot) {
+            low_idx ++;
+
+            swap(&input_arr[low_idx], &input_arr[cur_idx]);
+        }
+    }
+
+    swap(&input_arr[low_idx + 1], &input_arr[high]);
+
+    return low_idx + 1;
+}
+
+void quick_sort(int* input_arr, int low, int high) {
+    if (low < high) {
+        int pivot = partition(input_arr, low, high);
+
+        quick_sort(input_arr, low, pivot - 1);
+        quick_sort(input_arr, pivot + 1, high);
+    }
+}
+
+/*====================================*/
+
+
